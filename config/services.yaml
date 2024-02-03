@@ -1,0 +1,15 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    # makes classes in src/ available to be used as services
+    # this creates a service per class whose id is the fully-qualified class name
+    App\:
+        resource: '../src/'
+        exclude:
+            - '../src/Kernel.php'
+    
+    Doctrine\Migrations\Tools\Console\Command\:
+        resource: '../vendor/doctrine/migrations/lib/Doctrine/Migrations/Tools/Console/Command'
+        tags: [ 'console.command' ]

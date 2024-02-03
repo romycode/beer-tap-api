@@ -1,0 +1,44 @@
+version: "3.4"
+
+services:
+  skeleton-php-symfony-fpm-test:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - skeleton-php-symfony-postgres-test
+    environment:
+      APP_ENV: test
+    volumes:
+      - ./:/srv/app
+      - ./docker/php/conf.d/symfony.dev.ini:/usr/local/etc/php/conf.d/symfony.ini
+    networks:
+      skeleton-php-symfony-net-test:
+  
+  skeleton-php-symfony-postgres-test:
+    container_name: skeleton-php-symfony-postgres-test
+    image: postgres:14-alpine
+    # For some reason, if env vars are loaded like: 
+    # env_file:
+    #  - .env.test
+    # The tests are failing. If you see the environment vars inside the container (docker inspect), you will see that it's like a merge between .env and .env.test 
+    #  ¯\_(ツ)_/¯
+    environment:
+      - POSTGRES_DB=postgres_database
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      skeleton-php-symfony-net-test:
+
+volumes:
+  skeleton-php-symfony-postgres-volume-testing:
+
+networks:
+  skeleton-php-symfony-net-test:
+    name: skeleton-php-symfony-net-test

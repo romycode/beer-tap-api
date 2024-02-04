@@ -1,4 +1,4 @@
-openapi: 3.1.0
+openapi: 3.0.3
 info:
   description: "This API manages the flow of a tap beer dispenser mechanism to help those bars that allow their clients 
   to serve themselves beer. Every time a client opens the tap, this API starts counting how many liters come out of the 

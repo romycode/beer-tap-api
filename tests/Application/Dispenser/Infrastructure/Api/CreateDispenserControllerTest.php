@@ -2,7 +2,6 @@
 
 namespace App\Tests\Application\Dispenser\Infrastructure\Api;
 
-use App\Shared\Infrastructure\StaticUuidGenerator;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Response;

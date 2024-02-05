@@ -15,8 +15,8 @@ migrate: up
 	docker compose run --rm skeleton-php-symfony-fpm sh -c "\
 			bin/console d:d:c --if-not-exists 		    ;\
 			bin/console d:d:c --env=test --if-not-exists;\
-			bin/console d:m:m		   					;\
-			bin/console d:m:m --env=test 				;"
+			bin/console d:m:m -n 		   					;\
+			bin/console d:m:m -n --env=test 				;"
 
 migrate/force: up
 	docker compose run --rm skeleton-php-symfony-fpm sh -c "\

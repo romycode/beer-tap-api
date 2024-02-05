@@ -22,8 +22,8 @@ final class Version20240203155012 extends AbstractMigration
         $table->addColumn('id', Types::GUID)->setNotnull(true)->setLength(36);
         $table->addColumn('dispenser_id', Types::GUID)->setNotnull(true);
         $table->addColumn('opened_at', Types::BIGINT)->setNotnull(true);
-         $table->addColumn('flow_volume', Types::FLOAT)->setNotnull(true);
-        $table->addColumn('closed_at', Types::BIGINT)->setNotnull(false);
+        $table->addColumn('flow_volume', Types::FLOAT)->setNotnull(true);
+        $table->addColumn('closed_at', Types::BIGINT)->setNotnull(false)->setDefault(null);
         $table->addColumn('duration', Types::INTEGER)->setNotnull(false);
         $table->addColumn('output_volume', Types::DECIMAL)->setNotnull(false);
 

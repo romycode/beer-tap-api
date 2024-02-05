@@ -41,7 +41,7 @@ final class Dispenser
         return $this->createdAt;
     }
 
-    public function open(?\DateTimeImmutable $updatedAt, Clock $clock): void
+    public function open(\DateTimeImmutable $updatedAt): void
     {
         if ($this->status->value == DispenserStatus::Open->value) {
             throw new DispenserStatusUpdateFailed(DispenserStatus::Open->value);
@@ -49,15 +49,17 @@ final class Dispenser
 
         $this->status = DispenserStatus::Open;
 
-        $this->record(new DispenserOpened($this->id->toString(), $updatedAt ?? $clock->current()));
+        $this->record(new DispenserOpened($this->id->toString(), $updatedAt));
     }
 
-    public function close(): void
+    public function close(\DateTimeImmutable $updatedAt): void
     {
         if ($this->status->value == DispenserStatus::Close->value) {
             throw new DispenserStatusUpdateFailed(DispenserStatus::Close->value);
         }
 
         $this->status = DispenserStatus::Close;
+
+        $this->record(new DispenserClosed($this->id->toString(), $updatedAt));
     }
 }

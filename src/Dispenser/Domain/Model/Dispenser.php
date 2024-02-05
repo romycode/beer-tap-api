@@ -35,4 +35,22 @@ final class Dispenser
     {
         return $this->createdAt;
     }
+
+    public function open(): void
+    {
+        if ($this->status->value == DispenserStatus::Open->value) {
+            throw new DispenserStateChangeFailed(DispenserStatus::Open->value);
+        }
+
+        $this->status = DispenserStatus::Open;
+    }
+
+    public function close(): void
+    {
+        if ($this->status->value == DispenserStatus::Close->value) {
+            throw new DispenserStateChangeFailed(DispenserStatus::Close->value);
+        }
+
+        $this->status = DispenserStatus::Close;
+    }
 }

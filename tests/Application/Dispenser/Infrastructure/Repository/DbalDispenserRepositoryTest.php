@@ -5,7 +5,6 @@ namespace App\Tests\Application\Dispenser\Infrastructure\Repository;
 use App\Dispenser\Domain\Model\Dispenser;
 use App\Dispenser\Domain\Model\DispenserStatus;
 use App\Dispenser\Domain\Repository\DispenserRepository;
-use App\Dispenser\Domain\Repository\Exception\DispenserAlreadyExists;
 use App\Dispenser\Domain\Repository\Exception\DispenserNotFound;
 use App\Shared\Domain\Uuid;
 use Doctrine\DBAL\Connection;
@@ -44,9 +43,41 @@ class DbalDispenserRepositoryTest extends WebTestCase
         );
         $this->sut->save($expected);
 
-        self::assertEquals(
+        $this->assertDispenser(
             $expected,
             $this->sut->findById(Uuid::fromString(self::DISPENSER_ID))
         );
+    }
+
+    public function testShouldUpdateSavedDispenser(): void
+    {
+        $one = new Dispenser(
+            Uuid::fromString(self::DISPENSER_ID),
+            0.5,
+            DispenserStatus::Close,
+            new \DateTimeImmutable(),
+        );
+        $this->sut->save($one);
+
+        $expected = new Dispenser(
+            Uuid::fromString(self::DISPENSER_ID),
+            10.5,
+            DispenserStatus::Open,
+            new \DateTimeImmutable(),
+        );
+        $this->sut->save($expected);
+
+        $this->assertDispenser(
+            $expected,
+            $this->sut->findById(Uuid::fromString(self::DISPENSER_ID))
+        );
+    }
+
+    private function assertDispenser(Dispenser $expected, Dispenser $actual): void
+    {
+        self::assertEquals($expected->id()->toString(), $actual->id()->toString());
+        self::assertEquals($expected->flowVolume(), $actual->flowVolume());
+        self::assertEquals($expected->status()->value, $actual->status()->value);
+        self::assertEquals($expected->createdAt()->getTimestamp(), $actual->createdAt()->getTimestamp());
     }
 }

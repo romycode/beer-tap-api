@@ -11,6 +11,7 @@
         "doctrine/doctrine-migrations-bundle": "^3.2",
         "doctrine/migrations": "^3.5",
         "doctrine/orm": "^2.11",
+        "ramsey/uuid": "^4.7",
         "symfony/console": "6.0.*",
         "symfony/dotenv": "6.0.*",
         "symfony/messenger": "6.0.*",

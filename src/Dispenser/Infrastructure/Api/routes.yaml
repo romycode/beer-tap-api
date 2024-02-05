@@ -1,0 +1,4 @@
+create_dispenser:
+    path: /
+    controller: App\Dispenser\Infrastructure\Api\CreateDispenserController
+    methods: [POST]

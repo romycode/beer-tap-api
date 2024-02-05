@@ -3,6 +3,11 @@ Health:
     resource: ../src/Health/Infrastructure/Api/routes.yaml
     trailing_slash_on_root: false
 
+Dispenser:
+    prefix: /dispenser
+    resource: ../src/Dispenser/Infrastructure/Api/routes.yaml
+    trailing_slash_on_root: false
+
 kernel:
     resource: ../src/Kernel.php
     type: annotation

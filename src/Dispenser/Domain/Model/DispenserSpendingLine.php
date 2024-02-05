@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace App\Dispenser\Domain\Model;
 
-use App\Dispenser\Domain\Model\Exception\DispenserStatusUpdateFailed;
-use App\Shared\Domain\Clock;
-use App\Shared\Domain\EventRecorder;
 use App\Shared\Domain\Uuid;
 
 final class DispenserSpendingLine
@@ -16,6 +13,8 @@ final class DispenserSpendingLine
         private readonly Uuid $dispenserId,
         private readonly \DateTimeImmutable $openedAt,
         private readonly ?\DateTimeImmutable $closedAt,
+        private readonly ?int $duration,
+        private readonly ?float $outputVolume,
     ) {
     }
 
@@ -29,18 +28,23 @@ final class DispenserSpendingLine
         return $this->dispenserId;
     }
 
-    public function flowVolume(): float
-    {
-        return $this->flowVolume;
-    }
-
     public function openedAt(): \DateTimeImmutable
     {
         return $this->openedAt;
     }
 
-    public function closedAt(): \DateTimeImmutable
+    public function closedAt(): ?\DateTimeImmutable
     {
         return $this->closedAt;
+    }
+
+    public function duration(): ?int
+    {
+        return $this->duration;
+    }
+
+    public function outputVolume(): ?float
+    {
+        return $this->outputVolume;
     }
 }

@@ -7,7 +7,6 @@ namespace App\Dispenser\Infrastructure\Repository;
 use App\Dispenser\Domain\Model\Dispenser;
 use App\Dispenser\Domain\Model\DispenserStatus;
 use App\Dispenser\Domain\Repository\DispenserRepository;
-use App\Dispenser\Domain\Repository\Exception\DispenserAlreadyExists;
 use App\Dispenser\Domain\Repository\Exception\DispenserNotFound;
 use App\Shared\Domain\Uuid;
 use Doctrine\DBAL\Connection;
@@ -17,13 +16,14 @@ use Psr\Log\LoggerInterface;
 
 class DbalDispenserRepository implements DispenserRepository
 {
-    private const DATE_FORMAT = "U.u";
+    private const DATE_FORMAT = 'Uv';
+    private const DATE_DESERIALIZE_FORMAT = 'U.v';
     private const TABLE_NAME = 'dispensers';
     private const FIELD_TYPES = [
         'id' => 'guid',
         'state' => 'string',
         'flow_volume' => 'float',
-        'created_at' => 'string',
+        'created_at' => 'bigint',
     ];
 
     private Connection $connection;
@@ -51,13 +51,13 @@ class DbalDispenserRepository implements DispenserRepository
             throw new DispenserNotFound($uuid->toString());
         }
 
-        return $this->deserializeDispenser($data);
+        return $this->deserialize($data);
     }
 
     /** @throws Exception */
     final public function save(Dispenser $dispenser): void
     {
-        $data = $this->serializeDispenser($dispenser);
+        $data = $this->serialize($dispenser);
         $primaryKey = ['id' => $dispenser->id()->toString()];
         try {
             $this->connection->insert(
@@ -77,7 +77,7 @@ class DbalDispenserRepository implements DispenserRepository
         }
     }
 
-    private function serializeDispenser(Dispenser $dispenser): array
+    private function serialize(Dispenser $dispenser): array
     {
         return [
             'id' => $dispenser->id()->toString(),
@@ -87,16 +87,21 @@ class DbalDispenserRepository implements DispenserRepository
         ];
     }
 
-    private function deserializeDispenser(array $data): Dispenser
+    private function deserialize(array $data): Dispenser
     {
         return new Dispenser(
             Uuid::fromString($data['id']),
             floatval($data['flow_volume']),
             DispenserStatus::from($data['state']),
-            \DateTimeImmutable::createFromFormat(
-                self::DATE_FORMAT,
-                $data['created_at'],
-            ),
+            $this->deserializeDateTime(strval($data['created_at'])),
+        );
+    }
+
+    private function deserializeDateTime(string $createdAt): false|\DateTimeImmutable
+    {
+        return \DateTimeImmutable::createFromFormat(
+            self::DATE_DESERIALIZE_FORMAT,
+            substr($createdAt, 0, strlen($createdAt) - 3) . '.' . substr($createdAt, strlen($createdAt) - 3),
         );
     }
 }

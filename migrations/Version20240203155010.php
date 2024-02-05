@@ -22,9 +22,10 @@ final class Version20240203155010 extends AbstractMigration
         $table->addColumn('id', Types::GUID)->setNotnull(true)->setLength(36);
         $table->addColumn('state', Types::STRING)->setNotnull(true)->setDefault('closed');
         $table->addColumn('flow_volume', Types::FLOAT)->setNotnull(true);
-        $table->addColumn('created_at', Types::STRING)->setNotnull(true);
+        $table->addColumn('created_at', Types::BIGINT)->setNotnull(true);
 
         $table->setPrimaryKey(['id']);
+        $table->addIndex(['created_at'], 'idx_dispensers_created_at');
     }
 
     public function down(Schema $schema): void

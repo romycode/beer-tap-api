@@ -10,7 +10,7 @@ use App\Shared\Domain\Uuid;
 interface DispenserSpendingLineRepository
 {
     /** @return DispenserSpendingLine[] */
-    public function findByDispenserId(Uuid $dispenserId): array;
+    public function findAllByDispenserId(Uuid $dispenserId): array;
 
     public function save(DispenserSpendingLine $dispenserSpendingLine): void;
 }

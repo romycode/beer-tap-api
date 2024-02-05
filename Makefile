@@ -13,34 +13,37 @@ up: deps
 
 migrate: up
 	docker compose run --rm skeleton-php-symfony-fpm sh -c "\
-			bin/console d:d:c -q --if-not-exists 		    ;\
-			bin/console d:d:c -q --env=test --if-not-exists;\
-			bin/console d:m:m -q		   					;\
-			bin/console d:m:m -q --env=test 				;"
+			bin/console d:d:c --if-not-exists 		    ;\
+			bin/console d:d:c --env=test --if-not-exists;\
+			bin/console d:m:m		   					;\
+			bin/console d:m:m --env=test 				;"
 
 migrate/force: up
 	docker compose run --rm skeleton-php-symfony-fpm sh -c "\
-			bin/console d:d:c -q -f 		    ;\
-			bin/console d:d:c -q --env=test -f  ;\
-			bin/console d:m:m -q		   					;\
-			bin/console d:m:m -q --env=test 				;"
+			bin/console d:d:d -f  		    ;\
+			bin/console d:d:d -f --env=test   ;\
+			bin/console d:d:c  		    ;\
+            bin/console d:d:c --env=test   ;\
+			bin/console d:m:m -n		   					;\
+			bin/console d:m:m -n --env=test 				;"
 
 
 test: test/sunit test/sapplication
 
 test/sunit:
-	docker compose run skeleton-php-symfony-fpm bin/phpunit --order-by=random --testdox --testsuite Unit
+	docker compose run -e APP_ENV=test skeleton-php-symfony-fpm bin/phpunit --order-by=random --testdox --testsuite Unit
+
 test/sapplication:
-	docker compose run skeleton-php-symfony-fpm bin/phpunit --order-by=random --testdox --testsuite Application
+	docker compose run -e APP_ENV=test skeleton-php-symfony-fpm bin/phpunit --order-by=random --testdox --testsuite Application
 
 test/coverage: deps
-	docker compose run skeleton-php-symfony-fpm bin/phpunit --coverage-text --coverage-clover=coverage.xml --order-by=random
+	docker compose run -e APP_ENV=test skeleton-php-symfony-fpm bin/phpunit --coverage-text --coverage-clover=coverage.xml --order-by=random
 
 test/unit:
-	docker compose run skeleton-php-symfony-fpm bin/phpunit --coverage-text --order-by=random --testsuite Unit
+	docker compose run -e APP_ENV=test skeleton-php-symfony-fpm bin/phpunit --coverage-text --order-by=random --testsuite Unit
 
 test/application:
-	docker compose run skeleton-php-symfony-fpm bin/phpunit --coverage-text --order-by=random --testsuite Application
+	docker compose run -e APP_ENV=test skeleton-php-symfony-fpm bin/phpunit --coverage-text --order-by=random --testsuite Application
 
 bash:
 	docker compose run --rm skeleton-php-symfony-fpm sh

@@ -8,9 +8,10 @@ use App\Health\Application\Model\GetHealthResponse;
 use App\Health\Application\Query\GetHealthQuery;
 use App\Health\Domain\Repository\Exceptions\HealthRepositoryException;
 use App\Health\Domain\Repository\HealthRepositoryInterface;
+use App\Shared\Domain\QueryHandler;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 
-class GetHealthHandler implements MessageHandlerInterface
+class GetHealthHandler implements QueryHandler
 {
     private HealthRepositoryInterface $healthRepository;
 

@@ -57,6 +57,12 @@ class DbalDispenserSpendingLineRepository implements DispenserSpendingLineReposi
                 self::FIELD_TYPES
             );
         } catch (UniqueConstraintViolationException) {
+            $this->connection->update(
+                self::TABLE_NAME,
+                array_merge($data, $primaryKey),
+                $primaryKey,
+                self::FIELD_TYPES
+            );
         }
     }
 

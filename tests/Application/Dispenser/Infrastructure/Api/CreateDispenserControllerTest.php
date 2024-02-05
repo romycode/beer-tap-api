@@ -25,6 +25,14 @@ class CreateDispenserControllerTest extends WebTestCase
             '{"error":{"message":"missing required field \"flow_volume\"."}}',
             $this->client->getResponse()->getContent()
         );
+
+        $this->client->request('POST', '/dispenser', [], [], [], "");
+
+        $this->assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
+        $this->assertJsonStringEqualsJsonString(
+            '{"error":{"message":"missing required field \"flow_volume\"."}}',
+            $this->client->getResponse()->getContent()
+        );
     }
 
     public function testShouldReturnDispenserInformation(): void

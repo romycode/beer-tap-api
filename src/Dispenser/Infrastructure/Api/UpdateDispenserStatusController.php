@@ -6,6 +6,7 @@ use App\Dispenser\Application\Command\UpdateStatusDispenserCommand;
 use App\Dispenser\Domain\Model\DispenserStatus;
 use App\Dispenser\Domain\Model\Exception\DispenserStatusUpdateFailed;
 use App\Shared\Domain\Clock;
+use App\Shared\Domain\CommandBus;
 use DateTimeInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -17,11 +18,8 @@ use Symfony\Component\Messenger\MessageBusInterface;
 
 class UpdateDispenserStatusController extends AbstractController
 {
-    use HandleTrait;
-
-    public function __construct(MessageBusInterface $commandBus, private Clock $clock)
+    public function __construct(private CommandBus $commandBus, private Clock $clock)
     {
-        $this->messageBus = $commandBus;
     }
 
     private function validateRequest(array $data): ?JsonResponse
@@ -62,7 +60,7 @@ class UpdateDispenserStatusController extends AbstractController
             : $this->clock->current();
 
         try {
-            $this->handle(
+            $this->commandBus->execute(
                 new UpdateStatusDispenserCommand(
                     $id,
                     $data['status'],

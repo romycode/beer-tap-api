@@ -11,4 +11,18 @@ class GetSpendingLineForDispenserResponseCollection
         public readonly array $items
     ) {
     }
+
+    public function toArray(): array
+    {
+        $items = [];
+        foreach ($this->items as $item) {
+            $items[] = [
+                'closed_at' => $item->closedAt,
+                'opened_at' => $item->openedAt,
+                'flow_volume' => $item->flowVolume,
+                'total_amount' => $item->totalAmount,
+            ];
+        }
+        return $items;
+    }
 }

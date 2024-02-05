@@ -2,6 +2,15 @@ services:
     _defaults:
         autowire: true
         autoconfigure: true
+        
+    _instanceof:
+        App\Shared\Domain\QueryHandler:
+            tags: [{ name: messenger.message_handler, bus: query.bus }]
+        App\Shared\Domain\CommandHandler:
+            tags: [ { name: messenger.message_handler, bus: command.bus } ]
+        App\Shared\Domain\EventListener:
+            tags: [ { name: messenger.message_handler, bus: event.bus } ]
+
 
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
@@ -14,5 +23,15 @@ services:
         resource: '../vendor/doctrine/migrations/lib/Doctrine/Migrations/Tools/Console/Command'
         tags: [ 'console.command' ]
 
-    App\Dispenser\Infrastructure\Repository\DbalDispenserSpendingLineRepository:
-        public: true
+    App\Shared\Infrastructure\Symfony\InMemoryCommandBus:
+        bind:
+            $messageBus: '@command.bus'
+    
+    App\Shared\Infrastructure\Symfony\InMemoryQueryBus:
+        bind:
+            $messageBus: '@query.bus'
+    
+    App\Shared\Infrastructure\Symfony\InMemoryEventBus:
+        bind:
+            $messageBus: '@event.bus'
+            

@@ -1,0 +1,19 @@
+# config/packages/messenger.yaml
+framework:
+    messenger:
+        transports:
+            sync: 'sync://'
+        
+        default_bus: event.bus
+        buses: 
+            query.bus:
+                default_middleware: allow_no_handlers
+            command.bus:
+                default_middleware: allow_no_handlers
+            event.bus:
+                default_middleware: allow_no_handlers
+
+        routing:
+            App\Shared\Domain\Event: sync
+            App\Shared\Domain\Query: sync
+            App\Shared\Domain\Command: sync

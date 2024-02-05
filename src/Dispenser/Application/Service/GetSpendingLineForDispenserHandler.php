@@ -9,10 +9,10 @@ use App\Dispenser\Application\Model\GetSpendingLineForDispenserResponseCollectio
 use App\Dispenser\Application\Query\GetSpendingLineForDispenserQuery;
 use App\Dispenser\Domain\Repository\DispenserSpendingLineRepository;
 use App\Shared\Domain\Clock;
+use App\Shared\Domain\QueryHandler;
 use App\Shared\Domain\Uuid;
-use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 
-class GetSpendingLineForDispenserHandler implements MessageHandlerInterface
+class GetSpendingLineForDispenserHandler implements QueryHandler
 {
     public function __construct(
         private Clock $clock,

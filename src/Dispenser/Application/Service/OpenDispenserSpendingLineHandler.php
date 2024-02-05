@@ -8,10 +8,10 @@ use App\Dispenser\Application\Command\OpenDispenserSpendingLineCommand;
 use App\Dispenser\Domain\Model\DispenserSpendingLine;
 use App\Dispenser\Domain\Repository\DispenserRepository;
 use App\Dispenser\Domain\Repository\DispenserSpendingLineRepository;
+use App\Shared\Domain\CommandHandler;
 use App\Shared\Domain\Uuid;
-use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 
-class OpenDispenserSpendingLineHandler implements MessageHandlerInterface
+class OpenDispenserSpendingLineHandler implements CommandHandler
 {
     public function __construct(
         private DispenserRepository $dispenserRepository,

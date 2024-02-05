@@ -9,20 +9,17 @@ use App\Dispenser\Domain\Model\DispenserStatus;
 use App\Dispenser\Domain\Model\Exception\DispenserStatusUpdateFailed;
 use App\Dispenser\Domain\Repository\DispenserRepository;
 use App\Dispenser\Domain\Repository\Exception\DispenserNotFound;
+use App\Shared\Domain\CommandHandler;
+use App\Shared\Domain\EventBus;
 use App\Shared\Domain\Uuid;
-use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
-use Symfony\Component\Messenger\HandleTrait;
-use Symfony\Component\Messenger\MessageBusInterface;
 
-class UpdateDispenserStatusHandler implements MessageHandlerInterface
+class UpdateDispenserStatusHandler implements CommandHandler
 {
-    use HandleTrait;
 
     public function __construct(
-        MessageBusInterface $messageBus,
+        private EventBus $eventBus,
         private DispenserRepository $dispenserRepository,
     ) {
-        $this->messageBus = $messageBus;
     }
 
     /**
@@ -40,8 +37,6 @@ class UpdateDispenserStatusHandler implements MessageHandlerInterface
 
         $this->dispenserRepository->save($dispenser);
 
-        foreach ($dispenser->pullDomainEvents() as $event) {
-            $this->handle($event);
-        }
+        $this->eventBus->publish(...$dispenser->pullDomainEvents());
     }
 }

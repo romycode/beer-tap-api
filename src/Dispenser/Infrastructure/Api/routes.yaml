@@ -7,3 +7,8 @@ update_dispenser_status:
     path: /{id}/status
     controller: App\Dispenser\Infrastructure\Api\UpdateDispenserStatusController
     methods: [PUT]
+
+get_dispenser_lines:
+    path: /{id}/spending
+    controller: App\Dispenser\Infrastructure\Api\GetDispenserSpendingLinesController
+    methods: [ GET ]

@@ -6,10 +6,13 @@ namespace App\Dispenser\Application\Service;
 
 use App\Dispenser\Application\Command\CloseDispenserSpendingLineCommand;
 use App\Dispenser\Domain\Repository\DispenserSpendingLineRepository;
+use App\Shared\Domain\CommandHandler;
 use App\Shared\Domain\Uuid;
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 
-class CloseDispenserSpendingLineHandler implements MessageHandlerInterface
+
+class CloseDispenserSpendingLineHandler implements CommandHandler
 {
     public function __construct(
         private readonly DispenserSpendingLineRepository $dispenserSpendingLineRepository,
@@ -21,6 +24,7 @@ class CloseDispenserSpendingLineHandler implements MessageHandlerInterface
         $actual = $this->dispenserSpendingLineRepository->findLatestForDispenserId(
             Uuid::fromString($command->dispenserId)
         );
+
         $actual->close($command->closedAt);
         $this->dispenserSpendingLineRepository->save($actual);
     }

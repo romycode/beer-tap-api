@@ -6,22 +6,18 @@ namespace App\Dispenser\Application\Service;
 
 use App\Dispenser\Application\Command\CloseDispenserSpendingLineCommand;
 use App\Dispenser\Domain\Model\DispenserClosed;
-use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
-use Symfony\Component\Messenger\HandleTrait;
-use Symfony\Component\Messenger\MessageBusInterface;
+use App\Shared\Domain\CommandBus;
+use App\Shared\Domain\EventListener;
 
-class DispenserClosedListener implements MessageHandlerInterface
+class DispenserClosedListener implements EventListener
 {
-    use HandleTrait;
-
-    public function __construct(MessageBusInterface $messageBus,)
+    public function __construct(private CommandBus $commandBus)
     {
-        $this->messageBus = $messageBus;
     }
 
     public function __invoke(DispenserClosed $event): void
     {
-        $this->handle(
+        $this->commandBus->execute(
             new CloseDispenserSpendingLineCommand(
                 $event->id,
                 $event->closedAt,

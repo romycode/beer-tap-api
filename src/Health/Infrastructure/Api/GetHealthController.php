@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Messenger\HandleTrait;
 use Symfony\Component\Messenger\MessageBusInterface;
 
-class HealthController extends AbstractController
+class GetHealthController extends AbstractController
 {
     use HandleTrait;
 

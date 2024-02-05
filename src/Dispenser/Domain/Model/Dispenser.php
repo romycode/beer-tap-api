@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Dispenser\Domain\Model;
 
+use App\Dispenser\Domain\Model\Exception\DispenserStatusUpdateFailed;
 use App\Shared\Domain\Uuid;
 
 final class Dispenser
@@ -39,7 +40,7 @@ final class Dispenser
     public function open(): void
     {
         if ($this->status->value == DispenserStatus::Open->value) {
-            throw new DispenserStateChangeFailed(DispenserStatus::Open->value);
+            throw new DispenserStatusUpdateFailed(DispenserStatus::Open->value);
         }
 
         $this->status = DispenserStatus::Open;
@@ -48,7 +49,7 @@ final class Dispenser
     public function close(): void
     {
         if ($this->status->value == DispenserStatus::Close->value) {
-            throw new DispenserStateChangeFailed(DispenserStatus::Close->value);
+            throw new DispenserStatusUpdateFailed(DispenserStatus::Close->value);
         }
 
         $this->status = DispenserStatus::Close;

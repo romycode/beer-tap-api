@@ -2,3 +2,8 @@ create_dispenser:
     path: /
     controller: App\Dispenser\Infrastructure\Api\CreateDispenserController
     methods: [POST]
+
+update_dispenser_status:
+    path: /{id}/status
+    controller: App\Dispenser\Infrastructure\Api\UpdateDispenserStatusController
+    methods: [PUT]

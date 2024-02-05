@@ -23,8 +23,7 @@ class DbalDispenserSpendingLineRepositoryTest extends WebTestCase
         /** @var Connection $conn */
         $this->conn = self::getContainer()->get(Connection::class);
         $this->conn
-            ->prepare("delete from dispensers_spending_lines where id = ?")
-            ->executeQuery([self::DISPENSER_SPENDING_LINE_ONE_ID]);
+            ->executeQuery("truncate dispensers_spending_lines");
     }
 
     public function testShouldUpdateSavedDispenserSpendingLine(): void
@@ -32,6 +31,7 @@ class DbalDispenserSpendingLineRepositoryTest extends WebTestCase
         $line = new DispenserSpendingLine(
             Uuid::fromString(self::DISPENSER_SPENDING_LINE_ONE_ID),
             Uuid::fromString(self::DISPENSER_SPENDING_LINE_ONE_ID),
+             0.5,
             new \DateTimeImmutable(),
             null,
             null,
@@ -53,12 +53,13 @@ class DbalDispenserSpendingLineRepositoryTest extends WebTestCase
         );
     }
 
-    public function testShouldReturnAllLinesForDispenser(): void
+    public function testShouldReturnLatestLineForDispenser(): void
     {
         $start = new \DateTimeImmutable();
         $lineOne = new DispenserSpendingLine(
             Uuid::fromString(self::DISPENSER_SPENDING_LINE_ONE_ID),
             Uuid::fromString(self::DISPENSER_SPENDING_LINE_ONE_ID),
+            0.5,
             $start,
             $start->modify('+5 seconds'),
             5,
@@ -69,16 +70,16 @@ class DbalDispenserSpendingLineRepositoryTest extends WebTestCase
         $lineTwo = new DispenserSpendingLine(
             Uuid::fromString(self::DISPENSER_SPENDING_LINE_TWO_ID),
             Uuid::fromString(self::DISPENSER_SPENDING_LINE_ONE_ID),
-            $start->modify('+10 seconds'),
-            $start->modify('+20 seconds'),
+            0.5,
+            $start->modify('+10 second'),
+            $start->modify('+20 second'),
             10,
             20,
         );
         $this->sut->save($lineTwo);
 
-        $actual = $this->sut->findAllByDispenserId(Uuid::fromString(self::DISPENSER_SPENDING_LINE_ONE_ID));
+        $actual = $this->sut->findLatestForDispenserId(Uuid::fromString(self::DISPENSER_SPENDING_LINE_ONE_ID));
 
-        self::assertCount(2, $actual);
-        self::assertEquals([$lineOne->id()->toString(), $lineTwo->id()->toString()], array_map(static fn(DispenserSpendingLine $line) => $line->id()->toString(), $actual));
+        self::assertEquals(self::DISPENSER_SPENDING_LINE_TWO_ID, $actual->id()->toString());
     }
 }

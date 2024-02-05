@@ -11,6 +11,7 @@ final class DispenserSpendingLine
     public function __construct(
         private readonly Uuid $id,
         private readonly Uuid $dispenserId,
+        private readonly float $flowVolume,
         private readonly \DateTimeImmutable $openedAt,
         private readonly ?\DateTimeImmutable $closedAt,
         private readonly ?int $duration,
@@ -26,6 +27,11 @@ final class DispenserSpendingLine
     public function dispenserId(): Uuid
     {
         return $this->dispenserId;
+    }
+
+    public function flowVolume(): float
+    {
+        return $this->flowVolume;
     }
 
     public function openedAt(): \DateTimeImmutable

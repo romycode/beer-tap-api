@@ -21,6 +21,7 @@ class DbalDispenserSpendingLineRepository implements DispenserSpendingLineReposi
         'dispenser_id' => 'guid',
         'opened_at' => 'bigint',
         'closed_at' => 'bigint',
+        'flow_volume' => 'float',
         'duration' => 'integer',
         'output_volume' => 'float',
     ];
@@ -29,24 +30,19 @@ class DbalDispenserSpendingLineRepository implements DispenserSpendingLineReposi
     {
     }
 
-    public function findAllByDispenserId(Uuid $dispenserId): array
+    public function findLatestForDispenserId(Uuid $dispenserId): DispenserSpendingLine
     {
         $data = $this->connection
             ->createQueryBuilder()
             ->select('*')
             ->from(self::TABLE_NAME)
             ->where('dispenser_id = :dispenser_id')
-            ->orderBy('opened_at', 'desc')
             ->setParameter('dispenser_id', $dispenserId->toString(), Types::GUID)
+            ->orderBy('opened_at', 'DESC')
             ->executeQuery()
-            ->fetchAllAssociative();
+            ->fetchAssociative();
 
-        $collection = [];
-        foreach ($data as $line) {
-            $collection[] = $this->deserialize($line);
-        }
-
-        return $collection;
+        return $this->deserialize($data);
     }
 
     public function save(DispenserSpendingLine $dispenserSpendingLine): void
@@ -69,11 +65,27 @@ class DbalDispenserSpendingLineRepository implements DispenserSpendingLineReposi
         return [
             'id' => $dispenserSpendingLine->id()->toString(),
             'dispenser_id' => $dispenserSpendingLine->dispenserId()->toString(),
-            'opened_at' => floatval($dispenserSpendingLine->openedAt()->format(self::DATE_FORMAT)),
-            'closed_at' => floatval($dispenserSpendingLine->closedAt()?->format(self::DATE_FORMAT)),
+            'opened_at' => intval($dispenserSpendingLine->openedAt()->format(self::DATE_FORMAT)),
+            'closed_at' => intval($dispenserSpendingLine->closedAt()?->format(self::DATE_FORMAT)),
+            'flow_volume' => $dispenserSpendingLine->flowVolume(),
             'duration' => $dispenserSpendingLine->duration(),
             'output_volume' => $dispenserSpendingLine->outputVolume(),
         ];
+    }
+
+    public function findAllByDispenser(Uuid $dispenserId): array
+    {
+        $data = $this->connection
+            ->createQueryBuilder()
+            ->select('*')
+            ->from(self::TABLE_NAME)
+            ->where('dispenser_id = :dispenser_id')
+            ->setParameter('dispenser_id', $dispenserId->toString(), Types::GUID)
+            ->orderBy('opened_at', 'DESC')
+            ->executeQuery()
+            ->fetchAllAssociative();
+
+        return array_map(static fn($item) => $this->deserialize($item),$data);
     }
 
     private function deserialize(array $data): DispenserSpendingLine
@@ -81,6 +93,7 @@ class DbalDispenserSpendingLineRepository implements DispenserSpendingLineReposi
         return new DispenserSpendingLine(
             Uuid::fromString($data['id']),
             Uuid::fromString($data['dispenser_id']),
+            floatval($data['flow_volume']),
             $this->deserializeDateTime(strval($data['opened_at'])),
             null !== $data['closed_at']
                 ? $this->deserializeDateTime(strval($data['closed_at']))

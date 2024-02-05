@@ -5,10 +5,14 @@ declare(strict_types=1);
 namespace App\Dispenser\Domain\Model;
 
 use App\Dispenser\Domain\Model\Exception\DispenserStatusUpdateFailed;
+use App\Shared\Domain\Clock;
+use App\Shared\Domain\EventRecorder;
 use App\Shared\Domain\Uuid;
 
 final class Dispenser
 {
+    use EventRecorder;
+
     public function __construct(
         private readonly Uuid $id,
         private float $flowVolume,
@@ -37,13 +41,15 @@ final class Dispenser
         return $this->createdAt;
     }
 
-    public function open(): void
+    public function open(?\DateTimeImmutable $updatedAt, Clock $clock): void
     {
         if ($this->status->value == DispenserStatus::Open->value) {
             throw new DispenserStatusUpdateFailed(DispenserStatus::Open->value);
         }
 
         $this->status = DispenserStatus::Open;
+
+        $this->record(new DispenserOpened($this->id->toString(), $updatedAt ?? $clock->current()));
     }
 
     public function close(): void

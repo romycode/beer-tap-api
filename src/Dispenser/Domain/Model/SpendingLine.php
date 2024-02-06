@@ -7,7 +7,7 @@ namespace App\Dispenser\Domain\Model;
  use App\Shared\Domain\Clock;
 use App\Shared\Domain\Uuid;
 
-final class DispenserSpendingLine
+final class SpendingLine
 {
     private const DEFAULT_PRICE_LITER = '12.25';
 

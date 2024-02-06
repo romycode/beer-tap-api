@@ -4,21 +4,21 @@ namespace App\Tests\Unit\Dispenser\Application\Service;
 
 use App\Dispenser\Application\Command\CloseDispenserSpendingLineCommand;
 use App\Dispenser\Application\Service\CloseDispenserSpendingLineHandler;
-use App\Dispenser\Domain\Model\DispenserSpendingLine;
-use App\Dispenser\Domain\Repository\DispenserSpendingLineRepository;
+use App\Dispenser\Domain\Model\SpendingLine;
+use App\Dispenser\Domain\Repository\SpendingLineRepository;
 use App\Shared\Domain\Uuid;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class CloseDispenserSpendingLineHandlerTest extends TestCase
 {
-    private DispenserSpendingLineRepository|MockObject $dispenserSpendingLineRepository;
+    private SpendingLineRepository|MockObject $dispenserSpendingLineRepository;
     private CloseDispenserSpendingLineHandler $sut;
 
     final public function setUp(): void
     {
         parent::setUp();
-        $this->dispenserSpendingLineRepository = self::createMock(DispenserSpendingLineRepository::class);
+        $this->dispenserSpendingLineRepository = self::createMock(SpendingLineRepository::class);
         $this->sut = new CloseDispenserSpendingLineHandler($this->dispenserSpendingLineRepository);
     }
 
@@ -35,7 +35,7 @@ class CloseDispenserSpendingLineHandlerTest extends TestCase
             ->method('findLatestForDispenserId')
             ->with(Uuid::fromString($dispenserId))
             ->willReturn(
-                new DispenserSpendingLine(
+                new SpendingLine(
                     Uuid::fromString($id),
                     Uuid::fromString($dispenserId),
                     0.5,
@@ -50,7 +50,7 @@ class CloseDispenserSpendingLineHandlerTest extends TestCase
             ->expects(self::once())
             ->method('save')
             ->with(
-                new DispenserSpendingLine(
+                new SpendingLine(
                     Uuid::fromString($id),
                     Uuid::fromString($dispenserId),
                     0.5,

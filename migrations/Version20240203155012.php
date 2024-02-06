@@ -17,7 +17,7 @@ final class Version20240203155012 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
-        $table = $schema->createTable('dispensers_spending_lines');
+        $table = $schema->createTable('spending_lines');
 
         $table->addColumn('id', Types::GUID)->setNotnull(true)->setLength(36);
         $table->addColumn('dispenser_id', Types::GUID)->setNotnull(true);
@@ -32,6 +32,6 @@ final class Version20240203155012 extends AbstractMigration
 
     public function down(Schema $schema): void
     {
-        $schema->dropTable('dispensers_spending_lines');
+        $schema->dropTable('spending_lines');
     }
 }

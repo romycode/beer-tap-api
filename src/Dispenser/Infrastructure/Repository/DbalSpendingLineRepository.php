@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Dispenser\Infrastructure\Repository;
 
-use App\Dispenser\Domain\Model\DispenserSpendingLine;
-use App\Dispenser\Domain\Repository\DispenserSpendingLineRepository;
+use App\Dispenser\Domain\Model\SpendingLine;
+use App\Dispenser\Domain\Repository\SpendingLineRepository;
 use App\Shared\Domain\Exception\UnexpectedError;
 use App\Shared\Domain\Uuid;
 use Doctrine\DBAL\Connection;
@@ -14,11 +14,11 @@ use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\DBAL\Types\Types;
 use Psr\Log\LoggerInterface;
 
-class DbalDispenserSpendingLineRepository implements DispenserSpendingLineRepository
+class DbalSpendingLineRepository implements SpendingLineRepository
 {
     private const DATE_FORMAT = 'Uv'; // that doesn't work with create from format
     private const DATE_DESERIALIZE_FORMAT = 'U.v';
-    private const TABLE_NAME = 'dispensers_spending_lines';
+    private const TABLE_NAME = 'spending_lines';
     private const FIELD_TYPES = [
         'id' => 'guid',
         'dispenser_id' => 'guid',
@@ -34,7 +34,7 @@ class DbalDispenserSpendingLineRepository implements DispenserSpendingLineReposi
     }
 
     /** @throws UnexpectedError */
-    public function findLatestForDispenserId(Uuid $dispenserId): DispenserSpendingLine
+    public function findLatestForDispenserId(Uuid $dispenserId): SpendingLine
     {
         try {
             $data = $this->connection
@@ -55,7 +55,7 @@ class DbalDispenserSpendingLineRepository implements DispenserSpendingLineReposi
     }
 
     /** @throws UnexpectedError */
-    public function save(DispenserSpendingLine $dispenserSpendingLine): void
+    public function save(SpendingLine $dispenserSpendingLine): void
     {
         $data = $this->serialize($dispenserSpendingLine);
         $primaryKey = ['id' => $dispenserSpendingLine->id()->toString()];
@@ -100,7 +100,7 @@ class DbalDispenserSpendingLineRepository implements DispenserSpendingLineReposi
         return array_map(fn($item) => $this->deserialize($item), $data);
     }
 
-    private function serialize(DispenserSpendingLine $dispenserSpendingLine): array
+    private function serialize(SpendingLine $dispenserSpendingLine): array
     {
         return [
             'id' => $dispenserSpendingLine->id()->toString(),
@@ -115,9 +115,9 @@ class DbalDispenserSpendingLineRepository implements DispenserSpendingLineReposi
         ];
     }
 
-    private function deserialize(array $data): DispenserSpendingLine
+    private function deserialize(array $data): SpendingLine
     {
-        return new DispenserSpendingLine(
+        return new SpendingLine(
             Uuid::fromString($data['id']),
             Uuid::fromString($data['dispenser_id']),
             floatval($data['flow_volume']),

@@ -7,7 +7,7 @@ namespace App\Dispenser\Application\Service;
 use App\Dispenser\Application\Model\GetSpendingLineForDispenserResponse;
 use App\Dispenser\Application\Model\GetSpendingLineForDispenserResponseCollection;
 use App\Dispenser\Application\Query\GetSpendingLineForDispenserQuery;
-use App\Dispenser\Domain\Repository\DispenserSpendingLineRepository;
+use App\Dispenser\Domain\Repository\SpendingLineRepository;
 use App\Shared\Domain\Clock;
 use App\Shared\Domain\QueryHandler;
 use App\Shared\Domain\Uuid;
@@ -16,7 +16,7 @@ class GetSpendingLineForDispenserHandler implements QueryHandler
 {
     public function __construct(
         private Clock $clock,
-        private DispenserSpendingLineRepository $dispenserSpendingLineRepository,
+        private SpendingLineRepository $dispenserSpendingLineRepository,
     ) {
     }
 

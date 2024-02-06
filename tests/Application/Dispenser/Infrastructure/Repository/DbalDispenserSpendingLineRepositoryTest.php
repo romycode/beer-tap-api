@@ -2,8 +2,8 @@
 
 namespace App\Tests\Application\Dispenser\Infrastructure\Repository;
 
-use App\Dispenser\Domain\Model\DispenserSpendingLine;
-use App\Dispenser\Domain\Repository\DispenserSpendingLineRepository;
+use App\Dispenser\Domain\Model\SpendingLine;
+use App\Dispenser\Domain\Repository\SpendingLineRepository;
 use App\Shared\Domain\Uuid;
 use Doctrine\DBAL\Connection;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -12,23 +12,23 @@ class DbalDispenserSpendingLineRepositoryTest extends WebTestCase
 {
     private const DISPENSER_SPENDING_LINE_ONE_ID = "7420caff-23a0-4f5c-9bfa-c47f901502ba";
     private const DISPENSER_SPENDING_LINE_TWO_ID = "7420caff-23a0-4f5c-9bfa-c47f901502bb";
-    private DispenserSpendingLineRepository $sut;
+    private SpendingLineRepository $sut;
     private Connection $conn;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->sut = self::getContainer()->get(DispenserSpendingLineRepository::class);
+        $this->sut = self::getContainer()->get(SpendingLineRepository::class);
 
         /** @var Connection $conn */
         $this->conn = self::getContainer()->get(Connection::class);
         $this->conn
-            ->executeQuery("truncate dispensers_spending_lines");
+            ->executeQuery("truncate spending_lines");
     }
 
     public function testShouldUpdateSavedDispenserSpendingLine(): void
     {
-        $line = new DispenserSpendingLine(
+        $line = new SpendingLine(
             Uuid::fromString(self::DISPENSER_SPENDING_LINE_ONE_ID),
             Uuid::fromString(self::DISPENSER_SPENDING_LINE_ONE_ID),
              0.5,
@@ -40,7 +40,7 @@ class DbalDispenserSpendingLineRepositoryTest extends WebTestCase
         $this->sut->save($line);
 
         $actual = $this->conn
-            ->prepare("select id, dispenser_id, opened_at from dispensers_spending_lines where id = ?")
+            ->prepare("select id, dispenser_id, opened_at from spending_lines where id = ?")
             ->executeQuery([self::DISPENSER_SPENDING_LINE_ONE_ID])
             ->fetchAssociative();
 
@@ -56,7 +56,7 @@ class DbalDispenserSpendingLineRepositoryTest extends WebTestCase
     public function testShouldReturnLatestLineForDispenser(): void
     {
         $start = new \DateTimeImmutable();
-        $lineOne = new DispenserSpendingLine(
+        $lineOne = new SpendingLine(
             Uuid::fromString(self::DISPENSER_SPENDING_LINE_ONE_ID),
             Uuid::fromString(self::DISPENSER_SPENDING_LINE_ONE_ID),
             0.5,
@@ -67,7 +67,7 @@ class DbalDispenserSpendingLineRepositoryTest extends WebTestCase
         );
         $this->sut->save($lineOne);
 
-        $lineTwo = new DispenserSpendingLine(
+        $lineTwo = new SpendingLine(
             Uuid::fromString(self::DISPENSER_SPENDING_LINE_TWO_ID),
             Uuid::fromString(self::DISPENSER_SPENDING_LINE_ONE_ID),
             0.5,

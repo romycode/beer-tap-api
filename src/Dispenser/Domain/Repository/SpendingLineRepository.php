@@ -4,25 +4,25 @@ declare(strict_types=1);
 
 namespace App\Dispenser\Domain\Repository;
 
-use App\Dispenser\Domain\Model\DispenserSpendingLine;
+use App\Dispenser\Domain\Model\SpendingLine;
 use App\Shared\Domain\Exception\UnexpectedError;
 use App\Shared\Domain\Uuid;
 
-interface DispenserSpendingLineRepository
+interface SpendingLineRepository
 {
     /**
      * @param Uuid $dispenserId
-     * @return DispenserSpendingLine
+     * @return SpendingLine
      * @throws UnexpectedError
      */
-    public function findLatestForDispenserId(Uuid $dispenserId): DispenserSpendingLine;
+    public function findLatestForDispenserId(Uuid $dispenserId): SpendingLine;
 
     /**
-     * @return DispenserSpendingLine[]
+     * @return SpendingLine[]
      * @throws UnexpectedError
      */
     public function findAllByDispenser(Uuid $dispenserId): array;
 
     /** @throws UnexpectedError */
-    public function save(DispenserSpendingLine $dispenserSpendingLine): void;
+    public function save(SpendingLine $dispenserSpendingLine): void;
 }

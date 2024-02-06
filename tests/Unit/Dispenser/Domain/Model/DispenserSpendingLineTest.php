@@ -2,20 +2,20 @@
 
 namespace App\Tests\Unit\Dispenser\Domain\Model;
 
-use App\Dispenser\Domain\Model\DispenserSpendingLine;
+use App\Dispenser\Domain\Model\SpendingLine;
 use App\Shared\Domain\Clock;
 use App\Shared\Domain\Uuid;
 use PHPUnit\Framework\TestCase;
 
 class DispenserSpendingLineTest extends TestCase
 {
-    private DispenserSpendingLine $sut;
+    private SpendingLine $sut;
 
     public function testTotalAmount(): void
     {
         $base = new \DateTimeImmutable();
         $clock = $this->createMock(Clock::class);
-        $this->sut = new DispenserSpendingLine(
+        $this->sut = new SpendingLine(
             Uuid::fromString('9888838b-b027-438f-b6ab-dfdff00d5a7a'),
             Uuid::fromString('abf5b49e-29a4-4dde-9690-678941f58171'),
             0.064,
@@ -32,7 +32,7 @@ class DispenserSpendingLineTest extends TestCase
     {
         $base = new \DateTimeImmutable();
         $clock = $this->createMock(Clock::class);
-        $this->sut = new DispenserSpendingLine(
+        $this->sut = new SpendingLine(
             Uuid::fromString('9888838b-b027-438f-b6ab-dfdff00d5a7a'),
             Uuid::fromString('abf5b49e-29a4-4dde-9690-678941f58171'),
             0.064,

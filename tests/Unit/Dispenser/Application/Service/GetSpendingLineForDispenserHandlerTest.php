@@ -6,8 +6,8 @@ use App\Dispenser\Application\Model\GetSpendingLineForDispenserResponse;
 use App\Dispenser\Application\Model\GetSpendingLineForDispenserResponseCollection;
 use App\Dispenser\Application\Query\GetSpendingLineForDispenserQuery;
 use App\Dispenser\Application\Service\GetSpendingLineForDispenserHandler;
-use App\Dispenser\Domain\Model\DispenserSpendingLine;
-use App\Dispenser\Domain\Repository\DispenserSpendingLineRepository;
+use App\Dispenser\Domain\Model\SpendingLine;
+use App\Dispenser\Domain\Repository\SpendingLineRepository;
 use App\Shared\Domain\Clock;
 use App\Shared\Domain\Uuid;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -16,14 +16,14 @@ use PHPUnit\Framework\TestCase;
 class GetSpendingLineForDispenserHandlerTest extends TestCase
 {
     private Clock|MockObject $clock;
-    private DispenserSpendingLineRepository|MockObject $dispenserSpendingLineRepository;
+    private SpendingLineRepository|MockObject $dispenserSpendingLineRepository;
     private GetSpendingLineForDispenserHandler $sut;
 
     final public function setUp(): void
     {
         parent::setUp();
         $this->clock = self::createMock(Clock::class);
-        $this->dispenserSpendingLineRepository = self::createMock(DispenserSpendingLineRepository::class);
+        $this->dispenserSpendingLineRepository = self::createMock(SpendingLineRepository::class);
         $this->sut = new GetSpendingLineForDispenserHandler($this->clock, $this->dispenserSpendingLineRepository);
     }
 
@@ -39,7 +39,7 @@ class GetSpendingLineForDispenserHandlerTest extends TestCase
             ->method('findAllByDispenser')
             ->with(Uuid::fromString($dispenserId))
             ->willReturn([
-                new DispenserSpendingLine(
+                new SpendingLine(
                     Uuid::fromString($id),
                     Uuid::fromString($dispenserId),
                     0.01,

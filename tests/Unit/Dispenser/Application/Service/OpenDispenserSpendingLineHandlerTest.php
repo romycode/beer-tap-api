@@ -5,10 +5,10 @@ namespace App\Tests\Unit\Dispenser\Application\Service;
 use App\Dispenser\Application\Command\OpenDispenserSpendingLineCommand;
 use App\Dispenser\Application\Service\OpenDispenserSpendingLineHandler;
 use App\Dispenser\Domain\Model\Dispenser;
-use App\Dispenser\Domain\Model\DispenserSpendingLine;
+use App\Dispenser\Domain\Model\SpendingLine;
 use App\Dispenser\Domain\Model\DispenserStatus;
 use App\Dispenser\Domain\Repository\DispenserRepository;
-use App\Dispenser\Domain\Repository\DispenserSpendingLineRepository;
+use App\Dispenser\Domain\Repository\SpendingLineRepository;
 use App\Shared\Domain\Uuid;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -16,14 +16,14 @@ use PHPUnit\Framework\TestCase;
 class OpenDispenserSpendingLineHandlerTest extends TestCase
 {
     private DispenserRepository|MockObject $dispenserRepository;
-    private DispenserSpendingLineRepository|MockObject $dispenserSpendingLineRepository;
+    private SpendingLineRepository|MockObject $dispenserSpendingLineRepository;
     private OpenDispenserSpendingLineHandler $sut;
 
     final public function setUp(): void
     {
         parent::setUp();
         $this->dispenserRepository = self::createMock(DispenserRepository::class);
-        $this->dispenserSpendingLineRepository = self::createMock(DispenserSpendingLineRepository::class);
+        $this->dispenserSpendingLineRepository = self::createMock(SpendingLineRepository::class);
         $this->sut = new OpenDispenserSpendingLineHandler(
             $this->dispenserRepository,
             $this->dispenserSpendingLineRepository
@@ -53,7 +53,7 @@ class OpenDispenserSpendingLineHandlerTest extends TestCase
             ->expects(self::once())
             ->method('save')
             ->with(
-                new DispenserSpendingLine(
+                new SpendingLine(
                     Uuid::fromString($id),
                     Uuid::fromString($dispenserId),
                     0.5,

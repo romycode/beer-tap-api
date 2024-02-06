@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Dispenser\Domain\Model;
 
  use App\Shared\Domain\Clock;
-use App\Shared\Domain\Uuid;
+ use App\Shared\Domain\Uuid;
 
-final class SpendingLine
+ final class SpendingLine
 {
     private const DEFAULT_PRICE_LITER = '12.25';
 

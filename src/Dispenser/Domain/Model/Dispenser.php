@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Dispenser\Domain\Model;
 
 use App\Dispenser\Domain\Model\Exception\DispenserStatusUpdateFailed;
-use App\Shared\Domain\Clock;
 use App\Shared\Domain\EventRecorder;
 use App\Shared\Domain\Uuid;
 

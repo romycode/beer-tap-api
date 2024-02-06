@@ -3,7 +3,6 @@
 namespace App\Shared\Infrastructure\Symfony;
 
 
-use App\Shared\Domain\CommandBus;
 use App\Shared\Domain\Event;
 use App\Shared\Domain\EventBus;
 use Symfony\Component\Messenger\HandleTrait;

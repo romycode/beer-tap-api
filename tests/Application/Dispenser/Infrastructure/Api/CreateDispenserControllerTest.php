@@ -18,7 +18,7 @@ class CreateDispenserControllerTest extends WebTestCase
 
     public function testShouldReturnBadRequestIfAreMissingFields(): void
     {
-        $this->client->request('POST', '/dispenser', [], [], [], "{}");
+        $this->client->request('POST', '/dispenser', [], [], [], "");
 
         $this->assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
         $this->assertJsonStringEqualsJsonString(
@@ -26,7 +26,8 @@ class CreateDispenserControllerTest extends WebTestCase
             $this->client->getResponse()->getContent()
         );
 
-        $this->client->request('POST', '/dispenser', [], [], [], "");
+
+        $this->client->request('POST', '/dispenser', [], [], [], "{}");
 
         $this->assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
         $this->assertJsonStringEqualsJsonString(

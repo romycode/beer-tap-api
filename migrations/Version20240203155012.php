@@ -25,7 +25,7 @@ final class Version20240203155012 extends AbstractMigration
         $table->addColumn('flow_volume', Types::FLOAT)->setNotnull(true);
         $table->addColumn('closed_at', Types::BIGINT)->setNotnull(false)->setDefault(null);
         $table->addColumn('duration', Types::INTEGER)->setNotnull(false);
-        $table->addColumn('output_volume', Types::DECIMAL)->setNotnull(false);
+        $table->addColumn('output_volume', Types::FLOAT)->setNotnull(false);
 
         $table->setPrimaryKey(['id']);
     }

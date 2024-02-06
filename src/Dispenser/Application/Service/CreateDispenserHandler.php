@@ -10,6 +10,7 @@ use App\Dispenser\Domain\Model\DispenserStatus;
 use App\Dispenser\Domain\Repository\DispenserRepository;
 use App\Shared\Domain\Clock;
 use App\Shared\Domain\CommandHandler;
+use App\Shared\Domain\Exception\UnexpectedError;
 use App\Shared\Domain\Uuid;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
@@ -22,6 +23,7 @@ class CreateDispenserHandler implements CommandHandler
     ) {
     }
 
+    /** @throws UnexpectedError */
     public function __invoke(CreateDispenserCommand $command): void
     {
         $this->dispenserRepository->save(

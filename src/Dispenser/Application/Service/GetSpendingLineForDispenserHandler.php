@@ -28,12 +28,14 @@ class GetSpendingLineForDispenserHandler implements QueryHandler
 
         return new GetSpendingLineForDispenserResponseCollection(
             array_map(
-                fn($line) => new GetSpendingLineForDispenserResponse(
-                    $line->openedAt(),
-                    $line->closedAt(),
-                    $line->flowVolume(),
-                    $line->totalAmount($this->clock),
-                ),
+                function ($line) {
+                    return new GetSpendingLineForDispenserResponse(
+                        $line->openedAt(),
+                        $line->closedAt(),
+                        $line->flowVolume(),
+                        $line->totalAmount($this->clock),
+                    );
+                },
                 $lines
             )
         );

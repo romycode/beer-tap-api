@@ -4,17 +4,15 @@ namespace App\Dispenser\Infrastructure\Api;
 
 use App\Dispenser\Application\Command\UpdateStatusDispenserCommand;
 use App\Dispenser\Domain\Model\DispenserStatus;
-use App\Dispenser\Domain\Model\Exception\DispenserStatusUpdateFailed;
 use App\Shared\Domain\Clock;
 use App\Shared\Domain\CommandBus;
+use App\Shared\Domain\Exception\UnexpectedError;
 use DateTimeInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
-use Symfony\Component\Messenger\HandleTrait;
-use Symfony\Component\Messenger\MessageBusInterface;
 
 class UpdateDispenserStatusController extends AbstractController
 {
@@ -31,7 +29,10 @@ class UpdateDispenserStatusController extends AbstractController
             );
         }
 
-        if (!in_array($data['status'], array_map(static fn(\UnitEnum $case) => $case->value, DispenserStatus::cases()))) {
+        if (!in_array(
+            $data['status'],
+            array_map(static fn(\UnitEnum $case) => $case->value, DispenserStatus::cases())
+        )) {
             return $this->json(
                 ['error' => ['message' => 'field "status" accepts one of those values: [open, close].']],
                 Response::HTTP_UNPROCESSABLE_ENTITY,
@@ -68,10 +69,10 @@ class UpdateDispenserStatusController extends AbstractController
                 ),
             );
         } catch (HandlerFailedException $e) {
-            if ($e->getPrevious() instanceof DispenserStatusUpdateFailed) {
+            if ($e->getPrevious() instanceof UnexpectedError) {
                 return $this->json(
-                    ['error' => ['message' => 'dispenser is already opened/closed']],
-                    Response::HTTP_CONFLICT,
+                    ['error' => ['message' => $e->getPrevious()->getMessage()]],
+                    Response::HTTP_INTERNAL_SERVER_ERROR,
                 );
             }
         }

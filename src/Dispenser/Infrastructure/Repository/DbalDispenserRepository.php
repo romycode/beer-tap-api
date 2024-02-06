@@ -8,6 +8,7 @@ use App\Dispenser\Domain\Model\Dispenser;
 use App\Dispenser\Domain\Model\DispenserStatus;
 use App\Dispenser\Domain\Repository\DispenserRepository;
 use App\Dispenser\Domain\Repository\Exception\DispenserNotFound;
+use App\Shared\Domain\Exception\UnexpectedError;
 use App\Shared\Domain\Uuid;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
@@ -26,13 +27,8 @@ class DbalDispenserRepository implements DispenserRepository
         'created_at' => 'bigint',
     ];
 
-    private Connection $connection;
-    private LoggerInterface $logger;
-
-    public function __construct(Connection $connection, LoggerInterface $logger)
+    public function __construct(private readonly Connection $connection, private readonly LoggerInterface $logger)
     {
-        $this->logger = $logger;
-        $this->connection = $connection;
     }
 
     /** @throws DispenserNotFound|Exception */
@@ -74,6 +70,9 @@ class DbalDispenserRepository implements DispenserRepository
                 ],
                 self::FIELD_TYPES
             );
+        } catch (\Exception $e) {
+            $this->logger->critical($e);
+            throw new UnexpectedError($e);
         }
     }
 

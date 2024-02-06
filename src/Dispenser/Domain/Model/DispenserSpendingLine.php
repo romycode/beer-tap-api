@@ -62,7 +62,7 @@ final class DispenserSpendingLine
         $this->closedAt = $closedAt;
 
         $this->duration = intval($this->closedAt->format('Uv')) - intval($this->openedAt->format('Uv'));
-        $this->outputVolume = ($this->duration / 1000) * $this->flowVolume;
+        $this->outputVolume = (float) ($this->duration / 1000) * $this->flowVolume;
     }
 
     public function totalAmount(Clock $clock): float
@@ -70,7 +70,7 @@ final class DispenserSpendingLine
         if (null === $this->closedAt) {
             $closedAt = $clock->current();
             $duration = intval($closedAt->format('Uv')) - intval($this->openedAt->format('Uv'));
-            $outputVolume = ($duration / 1000) * $this->flowVolume;
+            $outputVolume = (float) ($duration / 1000) * $this->flowVolume;
             $totalAmount = $outputVolume * self::DEFAULT_PRICE_LITER;
         } else {
             $totalAmount = $this->outputVolume * self::DEFAULT_PRICE_LITER;

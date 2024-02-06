@@ -6,14 +6,17 @@ namespace App\Dispenser\Infrastructure\Repository;
 
 use App\Dispenser\Domain\Model\DispenserSpendingLine;
 use App\Dispenser\Domain\Repository\DispenserSpendingLineRepository;
+use App\Shared\Domain\Exception\UnexpectedError;
 use App\Shared\Domain\Uuid;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\DBAL\Types\Types;
+use Psr\Log\LoggerInterface;
 
 class DbalDispenserSpendingLineRepository implements DispenserSpendingLineRepository
 {
-    private const DATE_FORMAT = 'Uv';
+    private const DATE_FORMAT = 'Uv'; // that doesn't work with create from format
     private const DATE_DESERIALIZE_FORMAT = 'U.v';
     private const TABLE_NAME = 'dispensers_spending_lines';
     private const FIELD_TYPES = [
@@ -26,25 +29,32 @@ class DbalDispenserSpendingLineRepository implements DispenserSpendingLineReposi
         'output_volume' => 'float',
     ];
 
-    public function __construct(private Connection $connection)
+    public function __construct(private readonly Connection $connection, private readonly LoggerInterface $logger)
     {
     }
 
+    /** @throws UnexpectedError */
     public function findLatestForDispenserId(Uuid $dispenserId): DispenserSpendingLine
     {
-        $data = $this->connection
-            ->createQueryBuilder()
-            ->select('*')
-            ->from(self::TABLE_NAME)
-            ->where('dispenser_id = :dispenser_id')
-            ->setParameter('dispenser_id', $dispenserId->toString(), Types::GUID)
-            ->orderBy('opened_at', 'DESC')
-            ->executeQuery()
-            ->fetchAssociative();
+        try {
+            $data = $this->connection
+                ->createQueryBuilder()
+                ->select('*')
+                ->from(self::TABLE_NAME)
+                ->where('dispenser_id = :dispenser_id')
+                ->setParameter('dispenser_id', $dispenserId->toString(), Types::GUID)
+                ->orderBy('opened_at', 'DESC')
+                ->executeQuery()
+                ->fetchAssociative();
+        } catch (Exception $e) {
+            $this->logger->critical($e);
+            throw new UnexpectedError($e);
+        }
 
         return $this->deserialize($data);
     }
 
+    /** @throws UnexpectedError */
     public function save(DispenserSpendingLine $dispenserSpendingLine): void
     {
         $data = $this->serialize($dispenserSpendingLine);
@@ -63,7 +73,31 @@ class DbalDispenserSpendingLineRepository implements DispenserSpendingLineReposi
                 $primaryKey,
                 self::FIELD_TYPES
             );
+        } catch (Exception $e) {
+            $this->logger->critical($e);
+            throw new UnexpectedError($e);
         }
+    }
+
+    /** @throws UnexpectedError */
+    public function findAllByDispenser(Uuid $dispenserId): array
+    {
+        try {
+            $data = $this->connection
+                ->createQueryBuilder()
+                ->select('*')
+                ->from(self::TABLE_NAME)
+                ->where('dispenser_id = :dispenser_id')
+                ->setParameter('dispenser_id', $dispenserId->toString(), Types::GUID)
+                ->orderBy('opened_at', 'DESC')
+                ->executeQuery()
+                ->fetchAllAssociative();
+        } catch (Exception $e) {
+            $this->logger->critical($e);
+            throw new UnexpectedError($e);
+        }
+
+        return array_map(fn($item) => $this->deserialize($item), $data);
     }
 
     private function serialize(DispenserSpendingLine $dispenserSpendingLine): array
@@ -72,26 +106,13 @@ class DbalDispenserSpendingLineRepository implements DispenserSpendingLineReposi
             'id' => $dispenserSpendingLine->id()->toString(),
             'dispenser_id' => $dispenserSpendingLine->dispenserId()->toString(),
             'opened_at' => intval($dispenserSpendingLine->openedAt()->format(self::DATE_FORMAT)),
-            'closed_at' => intval($dispenserSpendingLine->closedAt()?->format(self::DATE_FORMAT)),
+            'closed_at' => null !== $dispenserSpendingLine->closedAt()
+                ? intval($dispenserSpendingLine->closedAt()->format(self::DATE_FORMAT))
+                : null,
             'flow_volume' => $dispenserSpendingLine->flowVolume(),
             'duration' => $dispenserSpendingLine->duration(),
             'output_volume' => $dispenserSpendingLine->outputVolume(),
         ];
-    }
-
-    public function findAllByDispenser(Uuid $dispenserId): array
-    {
-        $data = $this->connection
-            ->createQueryBuilder()
-            ->select('*')
-            ->from(self::TABLE_NAME)
-            ->where('dispenser_id = :dispenser_id')
-            ->setParameter('dispenser_id', $dispenserId->toString(), Types::GUID)
-            ->orderBy('opened_at', 'DESC')
-            ->executeQuery()
-            ->fetchAllAssociative();
-
-        return array_map(static fn($item) => $this->deserialize($item),$data);
     }
 
     private function deserialize(array $data): DispenserSpendingLine

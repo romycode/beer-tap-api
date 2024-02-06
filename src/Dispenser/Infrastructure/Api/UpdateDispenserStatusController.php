@@ -4,6 +4,7 @@ namespace App\Dispenser\Infrastructure\Api;
 
 use App\Dispenser\Application\Command\UpdateStatusDispenserCommand;
 use App\Dispenser\Domain\Model\DispenserStatus;
+use App\Dispenser\Domain\Model\Exception\DispenserStatusUpdateFailed;
 use App\Shared\Domain\Clock;
 use App\Shared\Domain\CommandBus;
 use App\Shared\Domain\Exception\UnexpectedError;
@@ -73,6 +74,12 @@ class UpdateDispenserStatusController extends AbstractController
                 return $this->json(
                     ['error' => ['message' => $e->getPrevious()->getMessage()]],
                     Response::HTTP_INTERNAL_SERVER_ERROR,
+                );
+            }
+            if ($e->getPrevious() instanceof DispenserStatusUpdateFailed) {
+                return $this->json(
+                    ['error' => ['message' => 'dispenser is already opened/closed']],
+                    Response::HTTP_CONFLICT,
                 );
             }
         }

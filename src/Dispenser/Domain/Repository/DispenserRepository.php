@@ -11,7 +11,7 @@ use App\Shared\Domain\Uuid;
 
 interface DispenserRepository
 {
-    /** @throws DispenserNotFound */
+    /** @throws DispenserNotFound|UnexpectedError */
     public function findById(Uuid $uuid): Dispenser;
 
     /** @throws UnexpectedError */

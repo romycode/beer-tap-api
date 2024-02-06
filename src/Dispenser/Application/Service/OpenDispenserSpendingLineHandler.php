@@ -7,8 +7,10 @@ namespace App\Dispenser\Application\Service;
 use App\Dispenser\Application\Command\OpenDispenserSpendingLineCommand;
 use App\Dispenser\Domain\Model\SpendingLine;
 use App\Dispenser\Domain\Repository\DispenserRepository;
+use App\Dispenser\Domain\Repository\Exception\DispenserNotFound;
 use App\Dispenser\Domain\Repository\SpendingLineRepository;
 use App\Shared\Domain\CommandHandler;
+use App\Shared\Domain\Exception\UnexpectedError;
 use App\Shared\Domain\Uuid;
 
 class OpenDispenserSpendingLineHandler implements CommandHandler
@@ -19,6 +21,10 @@ class OpenDispenserSpendingLineHandler implements CommandHandler
     ) {
     }
 
+    /**
+     * @throws UnexpectedError
+     * @throws DispenserNotFound
+     */
     public function __invoke(OpenDispenserSpendingLineCommand $command): void
     {
         $dispenser = $this->dispenserRepository->findById(Uuid::fromString($command->dispenserId));

@@ -31,17 +31,22 @@ class DbalDispenserRepository implements DispenserRepository
     {
     }
 
-    /** @throws DispenserNotFound|Exception */
+    /** @throws DispenserNotFound|UnexpectedError */
     final public function findById(Uuid $uuid): Dispenser
     {
-        $data = $this->connection
-            ->createQueryBuilder()
-            ->select('*')
-            ->from(self::TABLE_NAME)
-            ->where('id = :id')
-            ->setParameter('id', $uuid->toString(), Types::GUID)
-            ->executeQuery()
-            ->fetchAssociative();
+        try {
+            $data = $this->connection
+                ->createQueryBuilder()
+                ->select('*')
+                ->from(self::TABLE_NAME)
+                ->where('id = :id')
+                ->setParameter('id', $uuid->toString(), Types::GUID)
+                ->executeQuery()
+                ->fetchAssociative();
+        } catch (\Exception $e) {
+            $this->logger->critical($e);
+            throw new UnexpectedError($e);
+        }
 
         if (empty($data)) {
             throw new DispenserNotFound($uuid->toString());
@@ -50,26 +55,28 @@ class DbalDispenserRepository implements DispenserRepository
         return $this->deserialize($data);
     }
 
-    /** @throws Exception */
+    /** @throws UnexpectedError */
     final public function save(Dispenser $dispenser): void
     {
         $data = $this->serialize($dispenser);
         $primaryKey = ['id' => $dispenser->id()->toString()];
         try {
-            $this->connection->insert(
-                self::TABLE_NAME,
-                array_merge($data, $primaryKey),
-                self::FIELD_TYPES
-            );
-        } catch (Exception\UniqueConstraintViolationException) {
-            $this->connection->update(
-                self::TABLE_NAME,
-                array_merge($data, $primaryKey),
-                [
-                    'id' => $dispenser->id()->toString(),
-                ],
-                self::FIELD_TYPES
-            );
+            try {
+                $this->connection->insert(
+                    self::TABLE_NAME,
+                    array_merge($data, $primaryKey),
+                    self::FIELD_TYPES
+                );
+            } catch (Exception\UniqueConstraintViolationException) {
+                $this->connection->update(
+                    self::TABLE_NAME,
+                    array_merge($data, $primaryKey),
+                    [
+                        'id' => $dispenser->id()->toString(),
+                    ],
+                    self::FIELD_TYPES
+                );
+            }
         } catch (\Exception $e) {
             $this->logger->critical($e);
             throw new UnexpectedError($e);

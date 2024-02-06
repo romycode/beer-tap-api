@@ -18,30 +18,6 @@ class CreateDispenserController extends AbstractController
     {
     }
 
-    private function validateRequest(?array $data): ?JsonResponse
-    {
-        if (null === $data || !array_key_exists('flow_volume', $data)) {
-            return $this->json(
-                ['error' => ['message' => 'missing required field "flow_volume".']],
-                Response::HTTP_BAD_REQUEST,
-            );
-        }
-
-        if (!is_numeric($data['flow_volume'])) {
-            return $this->json(
-                ['error' => ['message' => 'missing required field "flow_volume".']],
-                Response::HTTP_UNPROCESSABLE_ENTITY,
-            );
-        }
-
-        return null;
-    }
-
-    private function getRequestBody(Request $request): ?array
-    {
-        return json_decode($request->getContent(), true);
-    }
-
     public function __invoke(Request $request): JsonResponse
     {
         $data = $this->getRequestBody($request);
@@ -70,5 +46,29 @@ class CreateDispenserController extends AbstractController
         }
 
         return $this->json($response, Response::HTTP_OK);
+    }
+
+    private function getRequestBody(Request $request): ?array
+    {
+        return json_decode($request->getContent(), true);
+    }
+
+    private function validateRequest(?array $data): ?JsonResponse
+    {
+        if (null === $data || !array_key_exists('flow_volume', $data)) {
+            return $this->json(
+                ['error' => ['message' => 'missing required field "flow_volume".']],
+                Response::HTTP_BAD_REQUEST,
+            );
+        }
+
+        if (!is_numeric($data['flow_volume'])) {
+            return $this->json(
+                ['error' => ['message' => 'missing required field "flow_volume".']],
+                Response::HTTP_UNPROCESSABLE_ENTITY,
+            );
+        }
+
+        return null;
     }
 }

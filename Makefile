@@ -34,7 +34,7 @@ migrate/force: up
 			bin/console d:m:m -n --env=test 				;"
 
 
-test: test/sunit test/migrate test/sapplication
+test: deps test/migrate test/sunit test/sapplication
 
 test/sunit:
 	docker compose run -e APP_ENV=test skeleton-php-symfony-fpm bin/phpunit --order-by=random --testdox --testsuite Unit
